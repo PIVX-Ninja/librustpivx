@@ -15,13 +15,13 @@ use super::{
     Authorization, TransactionData,
 };
 
-const ZCASH_SIGHASH_PERSONALIZATION_PREFIX: &[u8; 12] = b"ZcashSigHash";
-const ZCASH_PREVOUTS_HASH_PERSONALIZATION: &[u8; 16] = b"ZcashPrevoutHash";
-const ZCASH_SEQUENCE_HASH_PERSONALIZATION: &[u8; 16] = b"ZcashSequencHash";
-const ZCASH_OUTPUTS_HASH_PERSONALIZATION: &[u8; 16] = b"ZcashOutputsHash";
-const ZCASH_JOINSPLITS_HASH_PERSONALIZATION: &[u8; 16] = b"ZcashJSplitsHash";
-const ZCASH_SHIELDED_SPENDS_HASH_PERSONALIZATION: &[u8; 16] = b"ZcashSSpendsHash";
-const ZCASH_SHIELDED_OUTPUTS_HASH_PERSONALIZATION: &[u8; 16] = b"ZcashSOutputHash";
+const ZCASH_SIGHASH_PERSONALIZATION_PREFIX: &[u8; 16] = b"PIVXSigHash\0\0\0\0\0";
+const ZCASH_PREVOUTS_HASH_PERSONALIZATION: &[u8; 16] = b"PIVXPrevoutHash\0";
+const ZCASH_SEQUENCE_HASH_PERSONALIZATION: &[u8; 16] = b"PIVXSequencHash\0";
+const ZCASH_OUTPUTS_HASH_PERSONALIZATION: &[u8; 16] = b"PIVXOutputsHash\0";
+const ZCASH_JOINSPLITS_HASH_PERSONALIZATION: &[u8; 16] = b"PIVXJSplitsHash\0";
+const ZCASH_SHIELDED_SPENDS_HASH_PERSONALIZATION: &[u8; 16] = b"PIVXSSpendsHash\0";
+const ZCASH_SHIELDED_OUTPUTS_HASH_PERSONALIZATION: &[u8; 16] = b"PIVXSOutputHash\0";
 
 macro_rules! update_hash {
     ($h:expr, $cond:expr, $value:expr) => {
@@ -136,18 +136,13 @@ pub fn v4_signature_hash<
     signable_input: &SignableInput<'_>,
 ) -> Blake2bHash {
     let hash_type = signable_input.hash_type();
-    if tx.version.has_overwinter() {
-        let mut personal = [0; 16];
-        personal[..12].copy_from_slice(ZCASH_SIGHASH_PERSONALIZATION_PREFIX);
-        personal[12..].copy_from_slice(&u32::from(tx.consensus_branch_id).to_le_bytes());
 
+    if tx.version.has_overwinter() {
         let mut h = Blake2bParams::new()
             .hash_length(32)
-            .personal(&personal)
+            .personal(&*ZCASH_SIGHASH_PERSONALIZATION_PREFIX)
             .to_state();
-
-        h.update(&tx.version.header().to_le_bytes());
-        h.update(&tx.version.version_group_id().to_le_bytes());
+        h.update(&u32::from(tx.version.header()).to_le_bytes());
         update_hash!(
             h,
             hash_type & SIGHASH_ANYONECANPAY == 0,
@@ -191,7 +186,7 @@ pub fn v4_signature_hash<
             h.update(&[0; 32]);
         };
 
-        update_hash!(
+        /*update_hash!(
             h,
             !tx.sprout_bundle
                 .as_ref()
@@ -204,7 +199,7 @@ pub fn v4_signature_hash<
                     &bundle.joinsplit_pubkey,
                 )
             }
-        );
+        );*/
 
         if tx.version.has_sapling() {
             update_hash!(
@@ -221,13 +216,8 @@ pub fn v4_signature_hash<
                     .map_or(true, |b| b.shielded_outputs().is_empty()),
                 shielded_outputs_hash(tx.sapling_bundle.as_ref().unwrap().shielded_outputs())
             );
-        }
-        h.update(&tx.lock_time.to_le_bytes());
-        h.update(&u32::from(tx.expiry_height).to_le_bytes());
-        if tx.version.has_sapling() {
             h.update(&tx.sapling_value_balance().to_i64_le_bytes());
         }
-        h.update(&u32::from(hash_type).to_le_bytes());
 
         match signable_input {
             SignableInput::Shielded => (),
@@ -251,6 +241,9 @@ pub fn v4_signature_hash<
                 panic!("A request has been made to sign a TZE input, but the transaction version is not ZFuture");
             }
         }
+        h.update(&tx.lock_time.to_le_bytes());
+
+        h.update(&u32::from(hash_type).to_le_bytes());
 
         h.finalize()
     } else {

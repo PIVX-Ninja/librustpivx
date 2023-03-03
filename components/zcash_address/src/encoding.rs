@@ -118,27 +118,22 @@ impl FromStr for ZcashAddress {
 
         // The rest use Base58Check.
         if let Ok(decoded) = bs58::decode(s).with_check(None).into_vec() {
-            if decoded.len() >= 2 {
-                let (prefix, net) = match decoded[..2].try_into().unwrap() {
+            if decoded.len() >= 1 {
+                let (prefix, net) = match decoded[..1].try_into().unwrap() {
                     prefix @ (mainnet::B58_PUBKEY_ADDRESS_PREFIX
-                    | mainnet::B58_SCRIPT_ADDRESS_PREFIX
-                    | mainnet::B58_SPROUT_ADDRESS_PREFIX) => (prefix, NetworkType::Main),
+                    | mainnet::B58_SCRIPT_ADDRESS_PREFIX) => (prefix, NetworkType::Main),
                     prefix @ (testnet::B58_PUBKEY_ADDRESS_PREFIX
-                    | testnet::B58_SCRIPT_ADDRESS_PREFIX
-                    | testnet::B58_SPROUT_ADDRESS_PREFIX) => (prefix, NetworkType::Test),
+                    | testnet::B58_SCRIPT_ADDRESS_PREFIX) => (prefix, NetworkType::Test),
                     // We will not define new Base58Check address encodings.
                     _ => return Err(ParseError::NotZcash),
                 };
 
                 return match prefix {
-                    mainnet::B58_SPROUT_ADDRESS_PREFIX | testnet::B58_SPROUT_ADDRESS_PREFIX => {
-                        decoded[2..].try_into().map(AddressKind::Sprout)
-                    }
                     mainnet::B58_PUBKEY_ADDRESS_PREFIX | testnet::B58_PUBKEY_ADDRESS_PREFIX => {
-                        decoded[2..].try_into().map(AddressKind::P2pkh)
+                        decoded[1..].try_into().map(AddressKind::P2pkh)
                     }
                     mainnet::B58_SCRIPT_ADDRESS_PREFIX | testnet::B58_SCRIPT_ADDRESS_PREFIX => {
-                        decoded[2..].try_into().map(AddressKind::P2sh)
+                        decoded[1..].try_into().map(AddressKind::P2sh)
                     }
                     _ => unreachable!(),
                 }
@@ -156,8 +151,8 @@ fn encode_bech32<Ck: Checksum>(hrp: &str, data: &[u8]) -> String {
     bech32::encode::<Ck>(Hrp::parse_unchecked(hrp), data).expect("encoding is short enough")
 }
 
-fn encode_b58(prefix: [u8; 2], data: &[u8]) -> String {
-    let mut bytes = Vec::with_capacity(2 + data.len());
+fn encode_b58(prefix: [u8; 1], data: &[u8]) -> String {
+    let mut bytes = Vec::with_capacity(1 + data.len());
     bytes.extend_from_slice(&prefix);
     bytes.extend_from_slice(data);
     bs58::encode(bytes).with_check().into_string()
@@ -166,7 +161,7 @@ fn encode_b58(prefix: [u8; 2], data: &[u8]) -> String {
 impl fmt::Display for ZcashAddress {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let encoded = match &self.kind {
-            AddressKind::Sprout(data) => encode_b58(self.net.b58_sprout_address_prefix(), data),
+            AddressKind::Sprout(data) => encode_b58([1], data),
             AddressKind::Sapling(data) => {
                 encode_bech32::<Bech32>(self.net.hrp_sapling_payment_address(), data)
             }

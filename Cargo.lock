@@ -326,6 +326,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1505bd5d3d116872e7271a6d4e16d81d0c8570876c8de68093a09ac269d8aac0"
 
 [[package]]
+name = "atty"
+version = "0.2.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d9b39be18770d11421cdb1b9947a45dd3f37e93092cbf377614828a319d5fee8"
+dependencies = [
+ "hermit-abi 0.1.19",
+ "libc",
+ "winapi",
+]
+
+[[package]]
 name = "autocfg"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -416,6 +427,31 @@ name = "bech32"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d965446196e3b7decd44aa7ee49e31d630118f90ef12f97900f262eb915c951d"
+
+[[package]]
+name = "bellman"
+version = "0.14.0"
+dependencies = [
+ "bitvec",
+ "blake2s_simd",
+ "bls12_381",
+ "byteorder",
+ "criterion 0.4.0",
+ "crossbeam-channel",
+ "ff",
+ "group",
+ "hex-literal",
+ "lazy_static",
+ "log",
+ "num_cpus",
+ "pairing",
+ "rand",
+ "rand_core",
+ "rand_xorshift",
+ "rayon",
+ "sha2 0.10.8",
+ "subtle",
+]
 
 [[package]]
 name = "bellman"
@@ -718,6 +754,18 @@ dependencies = [
 
 [[package]]
 name = "clap"
+version = "3.2.25"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4ea181bf566f71cb9a5d17a59e1871af638180a18fb0035c92ae62b705207123"
+dependencies = [
+ "bitflags 1.3.2",
+ "clap_lex 0.2.4",
+ "indexmap 1.9.3",
+ "textwrap",
+]
+
+[[package]]
+name = "clap"
 version = "4.5.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b97f376d85a664d5837dbae44bf546e6477a679ff6610010f17276f686d867e8"
@@ -732,7 +780,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19bc80abd44e4bed93ca373a0704ccbd1b710dc5749406201bb018272808dc54"
 dependencies = [
  "anstyle",
- "clap_lex",
+ "clap_lex 0.7.2",
+]
+
+[[package]]
+name = "clap_lex"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2850f2f5a82cbf437dd5af4d49848fbdfc27c157c3d010345776f952765261c5"
+dependencies = [
+ "os_str_bytes",
 ]
 
 [[package]]
@@ -832,6 +889,32 @@ dependencies = [
 
 [[package]]
 name = "criterion"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e7c76e09c1aae2bc52b3d2f29e13c6572553b30c4aa1b8a49fd70de6412654cb"
+dependencies = [
+ "anes",
+ "atty",
+ "cast",
+ "ciborium",
+ "clap 3.2.25",
+ "criterion-plot",
+ "itertools 0.10.5",
+ "lazy_static",
+ "num-traits",
+ "oorandom",
+ "plotters",
+ "rayon",
+ "regex",
+ "serde",
+ "serde_derive",
+ "serde_json",
+ "tinytemplate",
+ "walkdir",
+]
+
+[[package]]
+name = "criterion"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2b12d017a929603d80db1831cd3a24082f8137ce19c69e6447f54f5fc8d692f"
@@ -839,7 +922,7 @@ dependencies = [
  "anes",
  "cast",
  "ciborium",
- "clap",
+ "clap 4.5.20",
  "criterion-plot",
  "is-terminal",
  "itertools 0.10.5",
@@ -1949,6 +2032,15 @@ checksum = "2304e00983f87ffb38b55b444b5e3b60a884b5d30c0fca7d82fe33449bbe55ea"
 
 [[package]]
 name = "hermit-abi"
+version = "0.1.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "62b467343b94ba476dcb2500d242dadbb39557df889310ac77c5d99100aaac33"
+dependencies = [
+ "libc",
+]
+
+[[package]]
+name = "hermit-abi"
 version = "0.3.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d231dfb89cfffdbc30e7fc41579ed6066ad03abda9e567ccafae602b97ec5024"
@@ -1958,6 +2050,12 @@ name = "hex"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
+
+[[package]]
+name = "hex-literal"
+version = "0.3.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7ebdb29d2ea9ed0083cd8cece49bbd968021bd99b0849edb4a9a7ee0fdf6a4e0"
 
 [[package]]
 name = "hkdf"
@@ -2168,12 +2266,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "incrementalmerkletree"
+version = "0.8.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "30821f91f0fa8660edca547918dc59812893b497d07c1144f326f07fdd94aba9"
+dependencies = [
+ "either",
+ "proptest",
+ "rand",
+ "rand_core",
+]
+
+[[package]]
 name = "incrementalmerkletree-testing"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dc7fb094e413bc6daea7b30a6f2c749e47fd07e98691c6ef3b3423d4ef4b7fb6"
 dependencies = [
- "incrementalmerkletree",
+ "incrementalmerkletree 0.7.1",
  "proptest",
 ]
 
@@ -2258,7 +2368,7 @@ version = "0.4.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f23ff5ef2b80d608d61efee834934d862cd92461afc0560dedf493e4c033738b"
 dependencies = [
- "hermit-abi",
+ "hermit-abi 0.3.9",
  "libc",
  "windows-sys 0.52.0",
 ]
@@ -2481,6 +2591,15 @@ checksum = "78ca9ab1a0babb1e7d5695e3530886289c18cf2f87ec19a575a0abdce112e3a3"
 
 [[package]]
 name = "memmap2"
+version = "0.5.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "83faa42c0a078c393f6b29d5db232d8be22776a891f8f56e5284faee4a20b327"
+dependencies = [
+ "libc",
+]
+
+[[package]]
+name = "memmap2"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fe751422e4a8caa417e13c3ea66452215d7d63e19e604f4980461212f3ae1322"
@@ -2691,7 +2810,7 @@ version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4161fcb6d602d4d2081af7c3a45852d875a03dd337a6bfdd6e06407b61342a43"
 dependencies = [
- "hermit-abi",
+ "hermit-abi 0.3.9",
  "libc",
 ]
 
@@ -2775,7 +2894,7 @@ dependencies = [
  "halo2_poseidon",
  "halo2_proofs",
  "hex",
- "incrementalmerkletree",
+ "incrementalmerkletree 0.7.1",
  "lazy_static",
  "memuse",
  "nonempty",
@@ -2801,6 +2920,12 @@ checksum = "68f19d67e5a2795c94e73e0bb1cc1a7edeb2e28efd39e2e1c9b7a40c1108b11c"
 dependencies = [
  "num-traits",
 ]
+
+[[package]]
+name = "os_str_bytes"
+version = "6.6.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2355d85b9a3786f481747ced0e0ff2ba35213a1f9bd406ed906554d7af805a1"
 
 [[package]]
 name = "overload"
@@ -2913,7 +3038,7 @@ dependencies = [
  "bls12_381",
  "ff",
  "getset",
- "incrementalmerkletree",
+ "incrementalmerkletree 0.7.1",
  "jubjub",
  "nonempty",
  "orchard",
@@ -2921,7 +3046,7 @@ dependencies = [
  "postcard",
  "rand_core",
  "redjubjub",
- "sapling-crypto",
+ "sapling",
  "secp256k1",
  "serde",
  "serde_with",
@@ -3135,13 +3260,13 @@ checksum = "439ee305def115ba05938db6eb1644ff94165c5ab5e9420d1c1bcedbba909391"
 
 [[package]]
 name = "pprof"
-version = "0.13.0"
+version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ef5c97c51bd34c7e742402e216abdeb44d415fbe6ae41d56b114723e953711cb"
+checksum = "196ded5d4be535690899a4631cc9f18cdc41b7ebf24a79400f46f48e49a11059"
 dependencies = [
  "backtrace",
  "cfg-if",
- "criterion",
+ "criterion 0.4.0",
  "findshlibs",
  "inferno",
  "libc",
@@ -3150,7 +3275,29 @@ dependencies = [
  "once_cell",
  "parking_lot",
  "smallvec",
- "symbolic-demangle",
+ "symbolic-demangle 10.2.1",
+ "tempfile",
+ "thiserror",
+]
+
+[[package]]
+name = "pprof"
+version = "0.13.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef5c97c51bd34c7e742402e216abdeb44d415fbe6ae41d56b114723e953711cb"
+dependencies = [
+ "backtrace",
+ "cfg-if",
+ "criterion 0.5.1",
+ "findshlibs",
+ "inferno",
+ "libc",
+ "log",
+ "nix",
+ "once_cell",
+ "parking_lot",
+ "smallvec",
+ "symbolic-demangle 12.13.3",
  "tempfile",
  "thiserror",
 ]
@@ -3778,32 +3925,36 @@ dependencies = [
 ]
 
 [[package]]
-name = "sapling-crypto"
+name = "sapling"
 version = "0.4.0"
-source = "git+https://github.com/zcash/sapling-crypto.git?rev=e607c52d13bb7ade66293f9ab8d07e311f4ad868#e607c52d13bb7ade66293f9ab8d07e311f4ad868"
 dependencies = [
  "aes",
- "bellman",
+ "bellman 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "bitvec",
  "blake2b_simd",
  "blake2s_simd",
  "bls12_381",
+ "chacha20poly1305",
  "core2",
+ "criterion 0.4.0",
  "document-features",
  "ff",
  "fpe",
  "getset",
  "group",
  "hex",
- "incrementalmerkletree",
+ "incrementalmerkletree 0.8.2",
  "jubjub",
  "lazy_static",
  "memuse",
+ "pprof 0.11.1",
  "proptest",
  "rand",
  "rand_core",
+ "rand_xorshift",
  "redjubjub",
  "subtle",
+ "tokio",
  "tracing",
  "zcash_note_encryption",
  "zcash_spec",
@@ -4048,7 +4199,7 @@ dependencies = [
  "assert_matches",
  "bitflags 2.6.0",
  "either",
- "incrementalmerkletree",
+ "incrementalmerkletree 0.7.1",
  "incrementalmerkletree-testing",
  "proptest",
  "tracing",
@@ -4299,14 +4450,37 @@ checksum = "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292"
 
 [[package]]
 name = "symbolic-common"
+version = "10.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b55cdc318ede251d0957f07afe5fed912119b8c1bc5a7804151826db999e737"
+dependencies = [
+ "debugid",
+ "memmap2 0.5.10",
+ "stable_deref_trait",
+ "uuid",
+]
+
+[[package]]
+name = "symbolic-common"
 version = "12.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "13a4dfe4bbeef59c1f32fc7524ae7c95b9e1de5e79a43ce1604e181081d71b0c"
 dependencies = [
  "debugid",
- "memmap2",
+ "memmap2 0.9.4",
  "stable_deref_trait",
  "uuid",
+]
+
+[[package]]
+name = "symbolic-demangle"
+version = "10.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "79be897be8a483a81fff6a3a4e195b4ac838ef73ca42d348b3f722da9902e489"
+dependencies = [
+ "cpp_demangle",
+ "rustc-demangle",
+ "symbolic-common 10.2.1",
 ]
 
 [[package]]
@@ -4317,7 +4491,7 @@ checksum = "98cf6a95abff97de4d7ff3473f33cacd38f1ddccad5c1feab435d6760300e3b6"
 dependencies = [
  "cpp_demangle",
  "rustc-demangle",
- "symbolic-common",
+ "symbolic-common 12.13.3",
 ]
 
 [[package]]
@@ -4371,6 +4545,12 @@ dependencies = [
  "rustix",
  "windows-sys 0.52.0",
 ]
+
+[[package]]
+name = "textwrap"
+version = "0.16.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23d434d3f8967a09480fb04132ebe0a3e088c173e6d0ee7897abbdf4eab0f8b9"
 
 [[package]]
 name = "thiserror"
@@ -4908,7 +5088,7 @@ dependencies = [
  "humantime",
  "humantime-serde",
  "itertools 0.13.0",
- "memmap2",
+ "memmap2 0.9.4",
  "once_cell",
  "oneshot-fused-workaround",
  "paste",
@@ -6165,7 +6345,7 @@ dependencies = [
  "http-body-util",
  "hyper",
  "hyper-util",
- "incrementalmerkletree",
+ "incrementalmerkletree 0.7.1",
  "jubjub",
  "memuse",
  "nom",
@@ -6182,7 +6362,7 @@ dependencies = [
  "rand_core",
  "rayon",
  "rust_decimal",
- "sapling-crypto",
+ "sapling",
  "secrecy",
  "serde",
  "serde_json",
@@ -6223,7 +6403,7 @@ dependencies = [
  "byteorder",
  "document-features",
  "group",
- "incrementalmerkletree",
+ "incrementalmerkletree 0.7.1",
  "incrementalmerkletree-testing",
  "jubjub",
  "maybe-rayon",
@@ -6236,7 +6416,7 @@ dependencies = [
  "rand_core",
  "regex",
  "rusqlite",
- "sapling-crypto",
+ "sapling",
  "schemerz",
  "schemerz-rusqlite",
  "secrecy",
@@ -6278,7 +6458,7 @@ dependencies = [
  "jubjub",
  "orchard",
  "rand_core",
- "sapling-crypto",
+ "sapling",
  "zcash_address",
  "zcash_primitives",
  "zcash_proofs",
@@ -6317,7 +6497,7 @@ dependencies = [
  "orchard",
  "proptest",
  "rand_core",
- "sapling-crypto",
+ "sapling",
  "secrecy",
  "subtle",
  "tracing",
@@ -6351,7 +6531,7 @@ dependencies = [
  "bs58",
  "chacha20poly1305",
  "core2",
- "criterion",
+ "criterion 0.5.1",
  "document-features",
  "equihash",
  "ff",
@@ -6359,22 +6539,23 @@ dependencies = [
  "getset",
  "group",
  "hex",
- "incrementalmerkletree",
+ "incrementalmerkletree 0.7.1",
  "jubjub",
  "memuse",
  "nonempty",
  "orchard",
- "pprof",
+ "pprof 0.13.0",
  "proptest",
  "rand",
  "rand_core",
  "rand_xorshift",
  "redjubjub",
  "ripemd 0.1.3",
- "sapling-crypto",
+ "sapling",
  "secp256k1",
  "sha2 0.10.8",
  "subtle",
+ "tokio",
  "tracing",
  "zcash_address",
  "zcash_encoding",
@@ -6389,7 +6570,7 @@ dependencies = [
 name = "zcash_proofs"
 version = "0.21.0"
 dependencies = [
- "bellman",
+ "bellman 0.14.0",
  "blake2b_simd",
  "bls12_381",
  "byteorder",
@@ -6402,7 +6583,7 @@ dependencies = [
  "minreq",
  "rand_core",
  "redjubjub",
- "sapling-crypto",
+ "sapling",
  "tracing",
  "wagyu-zcash-parameters",
  "xdg",
@@ -6416,7 +6597,7 @@ dependencies = [
  "core2",
  "document-features",
  "hex",
- "incrementalmerkletree",
+ "incrementalmerkletree 0.7.1",
  "incrementalmerkletree-testing",
  "memuse",
  "proptest",

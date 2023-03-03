@@ -20,8 +20,7 @@ use crate::transaction::{
     Transaction, TxVersion,
 };
 
-#[cfg(feature = "std")]
-use std::sync::mpsc::Sender;
+use tokio::sync::mpsc::Sender;
 
 #[cfg(feature = "circuits")]
 use {
@@ -405,7 +404,6 @@ impl<'a, P: consensus::Parameters> Builder<'a, P, ()> {
     /// sent represents the total steps completed so far. It will eventually send number
     /// of spends + outputs. If there's an error building the transaction, the channel is
     /// closed.
-    #[cfg(feature = "std")]
     pub fn with_progress_notifier(
         self,
         _progress_notifier: Sender<Progress>,

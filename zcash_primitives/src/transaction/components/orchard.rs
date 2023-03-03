@@ -74,13 +74,7 @@ pub fn read_v5_bundle<R: Read>(
             binding_signature,
         );
 
-        Ok(Some(orchard::Bundle::from_parts(
-            actions,
-            flags,
-            value_balance,
-            anchor,
-            authorization,
-        )))
+        Ok(None)
     }
 }
 
@@ -188,31 +182,6 @@ pub fn write_v5_bundle<W: Write>(
     bundle: Option<&orchard::Bundle<Authorized, ZatBalance>>,
     mut writer: W,
 ) -> io::Result<()> {
-    if let Some(bundle) = &bundle {
-        Vector::write_nonempty(&mut writer, bundle.actions(), |w, a| {
-            write_action_without_auth(w, a)
-        })?;
-
-        writer.write_all(&[bundle.flags().to_byte()])?;
-        writer.write_all(&bundle.value_balance().to_i64_le_bytes())?;
-        writer.write_all(&bundle.anchor().to_bytes())?;
-        Vector::write(
-            &mut writer,
-            bundle.authorization().proof().as_ref(),
-            |w, b| w.write_all(&[*b]),
-        )?;
-        Array::write(
-            &mut writer,
-            bundle.actions().iter().map(|a| a.authorization()),
-            |w, auth| w.write_all(&<[u8; 64]>::from(*auth)),
-        )?;
-        writer.write_all(&<[u8; 64]>::from(
-            bundle.authorization().binding_signature(),
-        ))?;
-    } else {
-        CompactSize::write(&mut writer, 0)?;
-    }
-
     Ok(())
 }
 

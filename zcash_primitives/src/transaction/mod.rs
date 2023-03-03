@@ -12,13 +12,16 @@ pub mod util;
 mod tests;
 
 use crate::encoding::{ReadBytesExt, WriteBytesExt};
+use ::transparent::bundle::{self as transparent, OutPoint, TxIn, TxOut};
 use blake2b_simd::Hash as Blake2bHash;
 use core::convert::TryFrom;
 use core::fmt::Debug;
 use core::ops::Deref;
 use core2::io::{self, Read, Write};
-
-use ::transparent::bundle::{self as transparent, OutPoint, TxIn, TxOut};
+use sapling::bundle::OutputDescription;
+use sapling::bundle::SpendDescription;
+//use sapling::bundle::Authorized;
+use crate::transaction::components::amount::Amount;
 use zcash_encoding::{CompactSize, Vector};
 use zcash_protocol::{
     consensus::{BlockHeight, BranchId},
@@ -43,7 +46,7 @@ use self::components::tze::{self, TzeIn, TzeOut};
 const OVERWINTER_VERSION_GROUP_ID: u32 = 0x03C48270;
 const OVERWINTER_TX_VERSION: u32 = 3;
 const SAPLING_VERSION_GROUP_ID: u32 = 0x892F2085;
-const SAPLING_TX_VERSION: u32 = 4;
+const SAPLING_TX_VERSION: u32 = 3;
 
 const V5_TX_VERSION: u32 = 5;
 const V5_VERSION_GROUP_ID: u32 = 0x26A7270A;
@@ -84,25 +87,10 @@ impl TxVersion {
         let overwintered = (header >> 31) == 1;
         let version = header & 0x7FFFFFFF;
 
-        if overwintered {
-            match (version, reader.read_u32_le()?) {
-                (OVERWINTER_TX_VERSION, OVERWINTER_VERSION_GROUP_ID) => Ok(TxVersion::Overwinter),
-                (SAPLING_TX_VERSION, SAPLING_VERSION_GROUP_ID) => Ok(TxVersion::Sapling),
-                (V5_TX_VERSION, V5_VERSION_GROUP_ID) => Ok(TxVersion::Zip225),
-                #[cfg(zcash_unstable = "zfuture")]
-                (ZFUTURE_TX_VERSION, ZFUTURE_VERSION_GROUP_ID) => Ok(TxVersion::ZFuture),
-                _ => Err(io::Error::new(
-                    io::ErrorKind::InvalidInput,
-                    "Unknown transaction format",
-                )),
-            }
-        } else if version >= 1 {
-            Ok(TxVersion::Sprout(version))
+        if version == 1 {
+            Ok(TxVersion::Sprout(1))
         } else {
-            Err(io::Error::new(
-                io::ErrorKind::InvalidInput,
-                "Unknown transaction format",
-            ))
+            Ok(TxVersion::Sapling)
         }
     }
 
@@ -110,7 +98,7 @@ impl TxVersion {
         // After Sprout, the overwintered bit is always set.
         let overwintered = match self {
             TxVersion::Sprout(_) => 0,
-            _ => 1 << 31,
+            _ => 0,
         };
 
         overwintered
@@ -137,10 +125,7 @@ impl TxVersion {
 
     pub fn write<W: Write>(&self, mut writer: W) -> io::Result<()> {
         writer.write_u32_le(self.header())?;
-        match self {
-            TxVersion::Sprout(_) => Ok(()),
-            _ => writer.write_u32_le(self.version_group_id()),
-        }
+        Ok(())
     }
 
     /// Returns `true` if this transaction version supports the Sprout protocol.
@@ -186,17 +171,7 @@ impl TxVersion {
 
     /// Suggests the transaction version that should be used in the given Zcash epoch.
     pub fn suggested_for_branch(consensus_branch_id: BranchId) -> Self {
-        match consensus_branch_id {
-            BranchId::Sprout => TxVersion::Sprout(2),
-            BranchId::Overwinter => TxVersion::Overwinter,
-            BranchId::Sapling | BranchId::Blossom | BranchId::Heartwood | BranchId::Canopy => {
-                TxVersion::Sapling
-            }
-            BranchId::Nu5 => TxVersion::Zip225,
-            BranchId::Nu6 => TxVersion::Zip225,
-            #[cfg(zcash_unstable = "zfuture")]
-            BranchId::ZFuture => TxVersion::ZFuture,
-        }
+        TxVersion::Sapling
     }
 }
 
@@ -607,15 +582,19 @@ impl Transaction {
 
         let lock_time = reader.read_u32_le()?;
         let expiry_height: BlockHeight = if version.has_overwinter() {
-            reader.read_u32_le()?.into()
+            let hi = reader.read_u8()?;
+            (hi as u32).into()
+        //0u32.into()
         } else {
             0u32.into()
         };
+        let (value_balance, shielded_spends, shielded_outputs) = if version.has_sapling() {
+            sapling_serialization::read_v4_components(&mut reader, version.has_sapling())?
+        } else {
+            (Amount::zero(), vec![], vec![])
+        };
 
-        let (value_balance, shielded_spends, shielded_outputs) =
-            sapling_serialization::read_v4_components(&mut reader, version.has_sapling())?;
-
-        let sprout_bundle = if version.has_sprout() {
+        let sprout_bundle = if false {
             let joinsplits = Vector::read(&mut reader, |r| {
                 JsDescription::read(r, version.has_sapling())
             })?;
@@ -777,7 +756,7 @@ impl Transaction {
         self.write_transparent(&mut writer)?;
         writer.write_u32_le(self.lock_time)?;
         if self.version.has_overwinter() {
-            writer.write_u32_le(u32::from(self.expiry_height))?;
+            writer.write_u8(1u8)?;
         }
 
         sapling_serialization::write_v4_components(
@@ -786,7 +765,7 @@ impl Transaction {
             self.version.has_sapling(),
         )?;
 
-        if self.version.has_sprout() {
+        if false {
             if let Some(bundle) = self.sprout_bundle.as_ref() {
                 Vector::write(&mut writer, &bundle.joinsplits, |w, e| e.write(w))?;
                 writer.write_all(&bundle.joinsplit_pubkey)?;

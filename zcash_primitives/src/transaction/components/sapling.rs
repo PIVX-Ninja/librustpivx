@@ -25,18 +25,7 @@ use crate::transaction::Transaction;
 
 /// Returns the enforcement policy for ZIP 212 at the given height.
 pub fn zip212_enforcement(params: &impl Parameters, height: BlockHeight) -> Zip212Enforcement {
-    if params.is_nu_active(NetworkUpgrade::Canopy, height) {
-        let grace_period_end_height =
-            params.activation_height(NetworkUpgrade::Canopy).unwrap() + ZIP212_GRACE_PERIOD;
-
-        if height < grace_period_end_height {
-            Zip212Enforcement::GracePeriod
-        } else {
-            Zip212Enforcement::On
-        }
-    } else {
-        Zip212Enforcement::Off
-    }
+    Zip212Enforcement::Off
 }
 
 /// A map from one bundle authorization to another.
