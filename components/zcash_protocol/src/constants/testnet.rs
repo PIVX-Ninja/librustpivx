@@ -19,7 +19,7 @@ pub const HRP_SAPLING_EXTENDED_SPENDING_KEY: &str = "p-secret-spending-key-test"
 ///
 /// [`ExtendedFullViewingKey`]: https://docs.rs/sapling-crypto/latest/sapling_crypto/zip32/struct.ExtendedFullViewingKey.html
 /// [ZIP 32]: https://github.com/zcash/zips/blob/master/zip-0032.rst
-pub const HRP_SAPLING_EXTENDED_FULL_VIEWING_KEY: &str = "pxviewtestsapling";
+pub const HRP_SAPLING_EXTENDED_FULL_VIEWING_KEY: &str = "ptviews";
 
 /// The HRP for a Bech32-encoded testnet Sapling [`PaymentAddress`].
 ///
@@ -27,7 +27,7 @@ pub const HRP_SAPLING_EXTENDED_FULL_VIEWING_KEY: &str = "pxviewtestsapling";
 ///
 /// [`PaymentAddress`]: https://docs.rs/sapling-crypto/latest/sapling_crypto/struct.PaymentAddress.html
 /// [Zcash Protocol Specification]: https://github.com/zcash/zips/blob/master/protocol/protocol.pdf
-pub const HRP_SAPLING_PAYMENT_ADDRESS: &str = "ptestsapling";
+pub const HRP_SAPLING_PAYMENT_ADDRESS: &str = "pts";
 
 /// The prefix for a Base58Check-encoded testnet Sprout address.
 ///
